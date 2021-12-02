@@ -8,7 +8,7 @@ This repo  will help to automate windows worker nodes into existing EKS Clusters
 2. EKS Windows Worker Node Instance IAM Role.
 3. Fetch the kubeconfig file of EKS Cluster to access the Cluster from terraform.
 
-## Objects will be created as below list :-
+## Objects will be created as below :-
 
 1. Webhook signed cert, csr, secret creation. ([create-signed-cert.tf](create-signed-cert.tf))
 
@@ -22,7 +22,15 @@ This repo  will help to automate windows worker nodes into existing EKS Clusters
 
 6. AWS Autoscaling group creation. ([aws_autoscaling_group.tf](aws_autoscaling_group.tf))
 
+## Templates tested for EKS Cluster version
+---
+
+1. EKS Cluster Version: 1.21
+2. VPC Resource Controller Version: v0.2.7
+3. VPC Admission Webhook Version: v0.2.7
+
 ## Steps to Execute :-
+---
 
 1. Set the aws environment values in terraform.tfvars ([terraform.tfvars](terraform.tfvars)) file. e.g aws_region, subnets, security_groups, cluster_name etc.
 2. Export AWS access-id, secret & token credentials
@@ -31,11 +39,11 @@ This repo  will help to automate windows worker nodes into existing EKS Clusters
 5. Terraform plan
 6. Terraform apply -auto-approve
 
-#### Note:- If you want to run terraform from cicd gitlab, place this file in a repo in gitlab project and use this .gitlab-ci.yml. ([.gitlab-ci.yml](.gitlab-ci.yml))
+#### Note:- If you want to run terraform from cicd gitlab, place these templates in a repo gitlab project and use .gitlab-ci.yml ([.gitlab-ci.yml](.gitlab-ci.yml))
 
 
 
-### Step 1: Create a secret for secure communicatio
+#### Step 1: Create a secret for secure communication
 ---
 
 ```
@@ -46,7 +54,7 @@ provisioner "local-exec" {
 }
 ```
 
-### Step 2: Create the VPC admission controller webhook manifest for your cluster
+#### Step 2: Create the VPC admission controller webhook manifest for your cluster
 ---
 ```
 resource "null_resource" "vpc-admission-webhook-kubectl" {
@@ -162,7 +170,7 @@ resource "kubernetes_mutating_webhook_configuration" "vpc_admission_webhook_cfg"
 }
 ```
 
-### Step 3: Deploy the VPC resource controller to your cluster
+#### Step 3: Deploy the VPC resource controller to your cluster
 ---
 ```
 resource "kubernetes_cluster_role" "vpc_resource_controller" {
@@ -267,7 +275,7 @@ resource "kubernetes_deployment" "vpc_resource_controller" {
 }
 ```
 
-### Step 4: Get the latest Windows AMI provided by AWS from SSM agent
+#### Step 4: Get the latest Windows AMI provided by AWS from SSM agent
 ---
 ```
 data "aws_ssm_parameter" "eks_worker_windows" {
@@ -275,7 +283,7 @@ data "aws_ssm_parameter" "eks_worker_windows" {
 }
 ```
 
-### Step 5: This Userdata script will be called out in launch template with rendered variable data and values to enable worker nodes to join  existing EKS Cluster with any extra ARGS
+#### Step 5: This Userdata script will be called out in launch template with rendered variable data and values to enable worker nodes to join  existing EKS Cluster with any extra ARGS
 ---
 ```
 data "template_file" "userdata_windows" {
@@ -292,7 +300,7 @@ data "template_file" "userdata_windows" {
 }
 ```
 
-### Step 6: Create AWS Launch Template for Worker Nodes with iam_instance_profile
+#### Step 6: Create AWS Launch Template for Worker Nodes with iam_instance_profile
 ---
 ```
 resource "aws_iam_instance_profile" "windows-node-role" {
@@ -357,7 +365,7 @@ monitoring {
 }
 ```
 
-## Step 7: Create Autoscaling Group
+#### Step 7: Create Autoscaling Group
 ---
 ```
 resource "aws_autoscaling_group" "workers" {

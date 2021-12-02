@@ -23,14 +23,12 @@ This repo  will help to automate windows worker nodes into existing EKS Clusters
 6. AWS Autoscaling group creation. ([aws_autoscaling_group.tf](aws_autoscaling_group.tf))
 
 ## Templates tested for EKS Cluster version
----
 
 1. EKS Cluster Version: 1.21
 2. VPC Resource Controller Version: v0.2.7
 3. VPC Admission Webhook Version: v0.2.7
 
 ## Steps to Execute :-
----
 
 1. Set the aws environment values in terraform.tfvars ([terraform.tfvars](terraform.tfvars)) file. e.g aws_region, subnets, security_groups, cluster_name etc.
 2. Export AWS access-id, secret & token credentials

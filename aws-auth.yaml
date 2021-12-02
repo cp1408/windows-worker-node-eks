@@ -1,0 +1,23 @@
+apiVersion: v1
+data:
+  mapRoles: |
+    - rolearn: arn:aws:iam::12345678790:role/NodeInstanceRole
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+###########  This section is to add windows_node_instance_role into existing aws-auth cm  ##########################
+    - rolearn: <ARN of instance role (not instance profile) of **Windows** node>
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+        - eks:kube-proxy-windows
+###################################################################################################################
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2021-11-19T18:28:32Z"
+  name: aws-auth
+  namespace: kube-system
+  resourceVersion: "600008"
+  uid: f9957add-5c64-4320-b936-01953a9aa905

@@ -1,0 +1,33 @@
+#image: docker.io/cicd-build-tools:v0.1
+
+variables:
+  EKS_CLUSTER_NAME: "eks-cluster"
+  ACCOUNT_ID: "abcdefghijkl"
+  REGION: "us-west-2"
+
+stages:
+  - Terraform-Creation
+
+build:                     
+  stage: Terraform-Creation 
+  #image: docker.io/hashi  
+  tags:                         
+    - runner-cicd
+  script:
+    - export AWS_DEFAULT_REGION
+    - AWS_STS_REGIONAL_ENDPOINTS=regional
+    - export AWS_STS_REGIONAL_ENDPOINTS  
+    - aws sts get-caller-identity --endpoint-url $epurl
+    - json_out=$(aws sts assume-role --role-arn arn:aws:iam::$ACCOUNT_ID:role/Gitlab-Runner-Role --role-session-name "$session_name" --endpoint-url $epurl)
+    - aws_access_key_id=$(echo "$json_out" | jq -r ".Credentials.AccessKeyId")
+    - aws_secret_access_key=$(echo "$json_out" | jq -r ".Credentials.SecretAccessKey")
+    - aws_session_token=$(echo "$json_out" | jq -r ".Credentials.SessionToken")
+    - export AWS_ACCESS_KEY_ID="$aws_access_key_id"
+    - export AWS_SECRET_ACCESS_KEY="$aws_secret_access_key"
+    - export AWS_SESSION_TOKEN="$aws_session_token"
+    - aws eks --region us-west-2 update-kubeconfig --name $EKS_CLUSTER_NAME
+    - terraform init 
+    - terraform validate
+    - export TF_LOG=TRACE
+    - terraform plan -input=false
+    - terraform apply -auto-approve -input=false

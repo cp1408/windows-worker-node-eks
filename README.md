@@ -55,12 +55,6 @@ provisioner "local-exec" {
 #### Step 2: Create the VPC admission controller webhook manifest for your cluster
 ---
 ```
-resource "null_resource" "vpc-admission-webhook-kubectl" {
-  provisioner "local-exec" {
-  command = "kubectl apply -f ./.rendered/vpc-admission-webhook.yaml"
-  } 
-}
-
 data "aws_eks_cluster" "cluster" {
   name = var.cluster_name
 }
